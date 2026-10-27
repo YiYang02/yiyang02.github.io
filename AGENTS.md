@@ -82,9 +82,10 @@ token table.
   copy, code, comments, docs, metadata, alt text, or commit messages. Startup work is described only by its
   engineering (architecture, reliability, testing, tooling), never by what the business does or how it gets data.
 - "Built" means Yi built it alone; "Co-built" means it was built with others. Never upgrade Co-built to Built.
-- The Microsoft entry has no bullets until the owner supplies them. Do not add placeholders.
-- No public email address. LinkedIn is the contact channel. The résumé is the existing 2024 PDF at
-  `/Yi_Yang_Resume_Version_NG_2024.pdf`.
+- The Microsoft entry's bullets come from the owner's verified work record (PRs, work items, and release data).
+  Change or add claims and numbers only with the owner's approval. Do not add placeholders.
+- No public email address. LinkedIn is the contact channel. The résumé is the PDF at `/Yi_Yang_Resume.pdf`; keep
+  this stable filename and replace the file in place when the résumé changes.
 
 ### Next.js and build rules
 

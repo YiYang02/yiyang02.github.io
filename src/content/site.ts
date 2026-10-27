@@ -150,11 +150,11 @@ const urls = {
   site: "https://yiyang02.github.io",
   github: "https://github.com/YiYang02",
   linkedin: "https://www.linkedin.com/in/yiyang0/",
-  resume: "/Yi_Yang_Resume_Version_NG_2024.pdf",
+  resume: "/Yi_Yang_Resume.pdf",
   source: "https://github.com/YiYang02/yiyang02.github.io",
 } as const;
 
-const resumeLink: LinkItem = { label: "Résumé (2024 PDF)", href: urls.resume };
+const resumeLink: LinkItem = { label: "Résumé (PDF)", href: urls.resume };
 const githubLink: LinkItem = { label: "GitHub", href: urls.github };
 const linkedinLink: LinkItem = { label: "LinkedIn", href: urls.linkedin };
 
@@ -163,7 +163,7 @@ export const siteMeta: SiteMeta = {
   name: "Yi Yang",
   title: "Yi Yang — Software Engineer",
   description:
-    "Software engineer on Microsoft Teams and founder of a stealth startup. Previously AWS EC2. Based in New York.",
+    "Software engineer on Microsoft Teams core services (Kubernetes, .NET 10, release engineering). Founder of a stealth startup. Based in New York.",
 };
 
 export const person: Person = {
@@ -197,7 +197,7 @@ export const header: HeaderContent = {
 };
 
 export const hero: HeroContent = {
-  kicker: "Software Engineer · Microsoft Teams",
+  kicker: "Software Engineer · Microsoft Teams core services",
   heading: "I build reliable systems and the products on top of them.",
   status: "Open to new opportunities",
   location: "New York, NY",
@@ -213,9 +213,19 @@ export const experience: ExperienceContent = {
       dates: "2024 — Present",
       role: "Software Engineer",
       org: "Microsoft",
-      team: "Teams",
-      bullets: [],
-      tags: [],
+      team: "Teams core services",
+      location: "New York, NY (Remote)",
+      context:
+        "Teams core services runs the API layer behind Microsoft Teams — hundreds of APIs that orchestrate dozens of backend systems — and a Tier-0 Azure platform that has hosted 36+ Teams services.",
+      bullets: [
+        "Led the final phase of the enterprise Teams API layer's move from Service Fabric to Kubernetes: cut over all US government-cloud and pre-production traffic in staged ramps, then deleted 13,000+ lines of dead deployment code.",
+        "Led the API layer's .NET 8 to .NET 10 upgrade: runtime canaries on Windows x64, Linux x64, and Linux ARM64; dual-runtime CI test gates; and staged waves that now cover every public production region and the US government clouds.",
+        "Replaced the platform's 39 classic release pipelines with 24 YAML pipelines generated from C#, then took ownership of the platform and retired infrastructure for 9+ services.",
+        "Planned and rolled out a three-phase right-sizing of a hosted Teams service's VM scale sets after a CPU optimization, removing 6,888 cores at an ~80% peak-CPU target.",
+        "Rotated 100+ auth certificates, moved the platform's certificates to a new Microsoft certificate authority in public and US government clouds, and rolled out CVE and FIPS security-baseline fixes to its VMs.",
+        "Rolled out AI-assisted pull-request review to every author on the platform's repository, with custom rules for PowerShell compatibility and infrastructure teardown.",
+      ],
+      tags: ["C#", ".NET", "Kubernetes", "Azure Service Fabric", "Azure DevOps", "PowerShell", "Envoy", "Redis", "KQL"],
     },
     {
       dates: "2025 — Present",
@@ -346,24 +356,44 @@ export const skills: SkillsContent = {
   id: "skills",
   label: "Skills",
   groups: [
-    { label: "Languages", items: ["TypeScript", "JavaScript", "Python", "Java", "SQL", "Ruby", "C"] },
-    { label: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "Electron", "Vite"] },
+    { label: "Languages", items: ["TypeScript", "C#", "Python", "JavaScript", "Java", "SQL", "PowerShell"] },
     {
       label: "Backend & data",
-      items: ["Node.js", "PostgreSQL", "SQLite", "Supabase", "Spring Boot", "Flask"],
+      items: [".NET (ASP.NET Core)", "Node.js", "PostgreSQL", "Redis", "SQLite", "Supabase", "DynamoDB"],
     },
     {
-      label: "Cloud & DevOps",
+      label: "Cloud & infra",
       items: [
-        "AWS (EC2, Lambda, Step Functions, S3, DynamoDB, CDK, CloudFormation)",
+        "Kubernetes",
+        "Azure (Service Fabric, Traffic Manager, Key Vault, VM Scale Sets)",
+        "AWS (EC2, Lambda, Step Functions, S3, CDK, CloudFormation)",
         "Docker",
-        "GitHub Actions",
-        "Railway",
+        "Envoy",
       ],
     },
     {
+      label: "Delivery & ops",
+      items: [
+        "Azure DevOps YAML pipelines",
+        "GitHub Actions",
+        "infrastructure as code",
+        "staged rollouts and canaries",
+        "KQL",
+        "OpenTelemetry",
+      ],
+    },
+    { label: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "Electron", "Vite"] },
+    {
       label: "AI & quality",
-      items: ["LLM APIs (Anthropic, OpenRouter)", "structured outputs", "Playwright", "Vitest"],
+      items: [
+        "Claude Code",
+        "GitHub Copilot CLI",
+        "AI pull-request review",
+        "LLM APIs (Anthropic, OpenRouter)",
+        "structured outputs",
+        "Playwright",
+        "Vitest",
+      ],
     },
   ],
 };
@@ -372,7 +402,7 @@ export const about: AboutContent = {
   id: "about",
   label: "About",
   paragraphs: [
-    "I'm a software engineer on Microsoft Teams. I'm drawn to systems where correctness is the product: pipelines that can't silently drop data, billing records that have to be right, and services that keep working when a dependency doesn't.",
+    "I'm a software engineer on Microsoft Teams core services, which runs the API layer behind Teams. Most of my work moves critical infrastructure forward in small, reversible steps — Service Fabric to Kubernetes, .NET 8 to .NET 10, classic release pipelines to generated ones. I'm drawn to systems where correctness is the product: pipelines that can't silently drop data, billing records that have to be right, and services that keep working when a dependency doesn't.",
     "Outside of work, I'm building a stealth startup from the ground up — product, architecture, and operations — including a cross-platform desktop app, two LLM-assisted Discord assistants, notification services, and the web platform that ties them together.",
     "I got my start in large-scale systems at Amazon Web Services, interning twice on EC2. On Aardvark, I extended an hourly canary pipeline for a system that aggregates 2+ PB of network-flow telemetry a day. On Quartz, I worked on the metering behind EC2 billing and reduced operational load by 7% for one core metering service.",
     "Before that, I studied Computer Science and Mathematics at Bowdoin College, where I was a CS teaching assistant, led the student newspaper's web team, and spent a summer doing machine-learning research at the University of North Texas.",
