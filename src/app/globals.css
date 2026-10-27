@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens (spec §4). The default palette is cleared so only these colors exist:
+ * bg-bg, text-ink, text-ink-2, text-muted, border-rule, text-accent, bg-accent-wash, decoration-underline.
+ */
+@theme {
+  --color-*: initial;
+  --color-bg: #ffffff;
+  --color-ink: #0d0d0f;
+  --color-ink-2: #4a4f57;
+  --color-muted: #5e636b;
+  --color-rule: #e7e8ea;
+  --color-accent: #2347e6;
+  --color-accent-wash: #e3e8fd;
+  --color-underline: #c9ccd2;
+
+  --container-page: 65rem;
+
+  --text-display: clamp(2.5rem, 5.2vw, 3.75rem);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 600;
+  --text-statement: clamp(1.5rem, 3.2vw, 2rem);
+  --text-statement--line-height: 1.2;
+  --text-statement--letter-spacing: -0.025em;
+  --text-statement--font-weight: 600;
+  --text-lede: 1.1875rem;
+  --text-lede--line-height: 1.6;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.35;
+  --text-title--letter-spacing: -0.01em;
+  --text-title--font-weight: 600;
+  --text-entry: 1.125rem;
+  --text-entry--line-height: 1.45;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.6;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.6;
+  --text-label--letter-spacing: 0.08em;
+}
+
+/* next/font exposes --font-geist-sans / --font-geist-mono on <html>; inline so utilities resolve there. */
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+  }
+
+  body {
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-wash);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .link {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--color-underline);
+    text-underline-offset: 4px;
+    transition: text-decoration-color 150ms ease-out;
+  }
+
+  .link:hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  /* Visible only while focused: the first Tab stop on every page. */
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    background-color: var(--color-ink);
+    color: var(--color-bg);
+  }
+
+  .skip-link:not(:focus) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Hero caret: blinks three times (3 × 1.1 s), then stays solid. */
+  .caret {
+    display: inline-block;
+    width: 0.45em;
+    height: 0.9em;
+    margin-left: 0.06em;
+    vertical-align: -0.08em;
+    background-color: var(--color-accent);
+    animation: caret-blink 1.1s step-end 3;
+  }
+
+  /* Click spark: a zero-size anchor at the click point; children are offset from it. */
+  .spark {
+    position: absolute;
+    width: 0;
+    height: 0;
+    animation: spark-life 900ms linear forwards;
+  }
+
+  .spark-glyph {
+    position: absolute;
+    top: 0;
+    left: 0;
+    translate: -50% -50%;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .spark-label {
+    position: absolute;
+    top: 0;
+    left: 14px;
+    translate: 0 -50%;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+    /* White halo keeps the label legible when it lands on top of dark text. */
+    text-shadow:
+      0 0 2px var(--color-bg),
+      0 0 4px var(--color-bg),
+      0 0 6px var(--color-bg);
+  }
+
+  .spark[data-flip] .spark-label {
+    right: 14px;
+    left: auto;
+  }
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 900 ms: scale/fade in over 120 ms, drift up 10 px, fade out over the last 250 ms. */
+@keyframes spark-life {
+  0% {
+    opacity: 0;
+    scale: 0.6;
+    translate: 0 0;
+  }
+  13.333% {
+    opacity: 1;
+    scale: 1;
+  }
+  72.222% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1;
+    translate: 0 -10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+  }
+
+  .spark-layer,
+  .spark-hint {
+    display: none;
+  }
+}
