@@ -63,13 +63,6 @@ Every push to `master` redeploys the site, so rolling back is an ordinary Git ch
 
 Either way, check the `revision` meta tag (see [Deploy](#deploy)) to confirm which commit is live.
 
-## Agent skills (optional, local-only)
-
-`scripts/bootstrap-skills.sh` installs pinned, verified design-review skills into `.github/skills/` and a
-Playwright virtualenv into `.venv/` for screenshot reviews. Both paths are gitignored and never committed. The
-script refuses to run on `master` or `gh-pages`, and expects a clean local checkout of the pinned skills repository
-(override its location with `AC_SRC`).
-
 ## License
 
 The code is released under the [MIT License](LICENSE). The text, images, and résumé are © Yi Yang, all rights

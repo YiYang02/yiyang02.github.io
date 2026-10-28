@@ -1,3 +1,0 @@
-{"mcpServers": {"playwright": {"type": "local", "command": "npx", "args": ["-y", "@playwright/mcp@0.0.83"],
-  "tools": ["browser_navigate", "browser_navigate_back", "browser_resize", "browser_snapshot", "browser_take_screenshot",
-    "browser_click", "browser_hover", "browser_press_key", "browser_evaluate", "browser_wait_for", "browser_console_messages"]}}}
