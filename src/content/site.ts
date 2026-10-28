@@ -132,6 +132,8 @@ export interface NotFoundContent {
 
 export interface SparkContent {
   frames: readonly string[];
+  /** The one glyph shown under reduced motion. */
+  still: string;
   labels: readonly string[];
   suffix: string;
 }
@@ -144,6 +146,15 @@ export interface UiStrings {
   separator: string;
   dash: string;
   emDash: string;
+  expand: string;
+  collapse: string;
+  showDetails: string;
+  hideDetails: string;
+  detailsFor: string;
+  themeGlyph: string;
+  themeSwitch: string;
+  themeDark: string;
+  themeLight: string;
 }
 
 const urls = {
@@ -183,6 +194,15 @@ export const ui: UiStrings = {
   separator: "·",
   dash: "–",
   emDash: "—",
+  expand: "+",
+  collapse: "−",
+  showDetails: "Show details",
+  hideDetails: "Hide details",
+  detailsFor: "for",
+  themeGlyph: "◐",
+  themeSwitch: "Switch to",
+  themeDark: "Dark mode",
+  themeLight: "Light mode",
 };
 
 export const header: HeaderContent = {
@@ -216,13 +236,15 @@ export const experience: ExperienceContent = {
       team: "Teams core services",
       location: "New York, NY (Remote)",
       context:
-        "Teams core services runs the API layer behind Microsoft Teams — hundreds of APIs that orchestrate dozens of backend systems — and a Tier-0 Azure platform that has hosted 36+ Teams services.",
+        "Teams core services runs the API layer behind Microsoft Teams — 700+ APIs that handle 25B+ calls a day on average and depend on 70+ downstream services — and the Tier-0 Service Fabric platforms behind enterprise and consumer Teams. In 2024, the enterprise platform hosted 36 Teams services on ~21K VMs.",
       bullets: [
-        "Led the final phase of the enterprise Teams API layer's move from Service Fabric to Kubernetes: cut over all US government-cloud and pre-production traffic in staged ramps, then deleted 13,000+ lines of dead deployment code.",
-        "Led the API layer's .NET 8 to .NET 10 upgrade: runtime canaries on Windows x64, Linux x64, and Linux ARM64; dual-runtime CI test gates; and staged waves that now cover every public production region and the US government clouds.",
-        "Replaced the platform's 39 classic release pipelines with 24 YAML pipelines generated from C#, then took ownership of the platform and retired infrastructure for 9+ services.",
-        "Planned and rolled out a three-phase right-sizing of a hosted Teams service's VM scale sets after a CPU optimization, removing 6,888 cores at an ~80% peak-CPU target.",
+        "Led the final phase of the enterprise Teams API layer's move from Service Fabric to Kubernetes: cut over all US government-cloud and pre-production traffic in staged ramps (99.97% availability across 14B+ government-cloud requests during the cutovers), then deleted 13,000+ lines of dead deployment code.",
+        "Led the API layer's .NET 8 to .NET 10 upgrade: runtime canaries on Windows x64, Linux x64, and Linux ARM64; dual-runtime CI test gates; and staged waves that now cover every public production region and the US government clouds. Public availability showed no regression: 99.97% in the first full week on .NET 10, versus 99.96% in a .NET 8 week.",
+        "Removed 6,888 cores — about $6M a year at Azure list prices — by right-sizing a hosted Teams service's VM scale sets in three phases after its CPU optimization, targeting ~80% peak CPU.",
+        "Replaced the platform's 39 classic release pipelines with 24 YAML pipelines generated from C#, then took ownership of the Tier-0 Service Fabric platforms for enterprise and consumer Teams, including 14 consumer clusters across 7 regions, and retired infrastructure for 9+ services as they moved off.",
+        "Migrated US government-cloud client and service-to-service API traffic onto new Standard load-balancer clusters for Azure's Basic public IP retirement, in staged 1%-to-100% ramps at 99.95% availability.",
         "Rotated 100+ auth certificates, moved the platform's certificates to a new Microsoft certificate authority in public and US government clouds, and rolled out CVE and FIPS security-baseline fixes to its VMs.",
+        "Wrote or co-wrote four design docs (the release-pipeline redesign and the Standard load-balancer migration), four architecture decision records, runbooks, and a certificate-rotation troubleshooting guide. Onboarded a teammate and a partner team.",
         "Rolled out AI-assisted pull-request review to every author on the platform's repository, with custom rules for PowerShell compatibility and infrastructure teardown.",
       ],
       tags: ["C#", ".NET", "Kubernetes", "Azure Service Fabric", "Azure DevOps", "PowerShell", "Envoy", "Redis", "KQL"],
@@ -406,6 +428,7 @@ export const about: AboutContent = {
     "Outside of work, I'm building a stealth startup from the ground up — product, architecture, and operations — including a cross-platform desktop app, two LLM-assisted Discord assistants, notification services, and the web platform that ties them together.",
     "I got my start in large-scale systems at Amazon Web Services, interning twice on EC2. On Aardvark, I extended an hourly canary pipeline for a system that aggregates 2+ PB of network-flow telemetry a day. On Quartz, I worked on the metering behind EC2 billing and reduced operational load by 7% for one core metering service.",
     "Before that, I studied Computer Science and Mathematics at Bowdoin College, where I was a CS teaching assistant, led the student newspaper's web team, and spent a summer doing machine-learning research at the University of North Texas.",
+    "I grew up in New York City, and my favorite way to get around it is Citi Bike. Away from the keyboard, I'm into street basketball, table tennis, running, and MMA.",
   ],
 };
 
@@ -445,6 +468,7 @@ export const notFound: NotFoundContent = {
 
 export const spark: SparkContent = {
   frames: ["·", "✢", "✳", "✶", "✻", "✽"],
+  still: "✻",
   labels: [
     "Compiling",
     "Refactoring",

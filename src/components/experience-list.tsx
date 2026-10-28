@@ -12,6 +12,33 @@ const datesClass =
 // A non-breaking space keeps each separator on the line it follows; names never split.
 const joiner = `\u00a0${ui.separator} `;
 
+const summaryClass =
+  "inline-flex min-h-6 cursor-pointer list-none items-center gap-2 font-mono text-label text-muted uppercase " +
+  "transition-colors duration-150 select-none hover:text-ink [&::-webkit-details-marker]:hidden";
+
+/** Native disclosure: works without JavaScript; Chromium's find-in-page also opens it to reveal matches. */
+function Details({ entry }: { entry: ExperienceEntry }) {
+  // Role and org repeat for the two AWS internships; the team keeps every accessible name unique.
+  const subject = [entry.role, entry.org, entry.team].filter(Boolean).join(", ");
+
+  return (
+    <details className="group mt-4 sm:col-start-2">
+      <summary className={summaryClass}>
+        <span aria-hidden="true" className="group-open:hidden">
+          {ui.expand}
+        </span>
+        <span aria-hidden="true" className="hidden group-open:inline">
+          {ui.collapse}
+        </span>
+        <span className="group-open:hidden">{ui.showDetails}</span>
+        <span className="hidden group-open:inline">{ui.hideDetails}</span>
+        <span className="sr-only normal-case">{` ${ui.detailsFor} ${subject}`}</span>
+      </summary>
+      <BulletList items={entry.bullets} className="mt-3 text-ink" />
+    </details>
+  );
+}
+
 function Entry({ entry }: { entry: ExperienceEntry }) {
   return (
     <li className={rowClass}>
@@ -35,7 +62,7 @@ function Entry({ entry }: { entry: ExperienceEntry }) {
       {entry.context ? (
         <p className="mt-3 max-w-[68ch] text-pretty text-ink-2 sm:col-start-2">{entry.context}</p>
       ) : null}
-      <BulletList items={entry.bullets} className="mt-3 text-ink sm:col-start-2" />
+      {entry.bullets.length > 0 ? <Details entry={entry} /> : null}
       <TagList tags={entry.tags} className="mt-4 sm:col-start-2" />
     </li>
   );

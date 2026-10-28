@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ClickSparkProps {
   frames: readonly string[];
+  still: string;
   labels: readonly string[];
   suffix: string;
 }
@@ -14,6 +15,8 @@ interface Spark {
   y: number;
   label: string;
   flip: boolean;
+  /** Reduced motion: one fixed glyph, no frame cycling. */
+  still: boolean;
 }
 
 const FRAME_MS = 90;
@@ -35,27 +38,31 @@ function pingPong(step: number, length: number) {
 interface SparkMarkProps {
   spark: Spark;
   frames: readonly string[];
+  still: string;
   onDone: (id: number) => void;
 }
 
 /** One spark. Owns its frame interval and lifetime timer, so unmounting always cleans them up. */
-function SparkMark({ spark, frames, onDone }: SparkMarkProps) {
+function SparkMark({ spark, frames, still, onDone }: SparkMarkProps) {
   const [step, setStep] = useState(0);
   const { id } = spark;
+  const isStill = spark.still;
 
   useEffect(() => {
-    const interval = window.setInterval(() => setStep((current) => current + 1), FRAME_MS);
+    const interval = isStill ? undefined : window.setInterval(() => setStep((current) => current + 1), FRAME_MS);
     const timeout = window.setTimeout(() => onDone(id), LIFETIME_MS);
     return () => {
       window.clearInterval(interval);
       window.clearTimeout(timeout);
     };
-  }, [id, onDone]);
+  }, [id, isStill, onDone]);
+
+  const glyph = isStill ? still : frames[pingPong(step, frames.length)];
 
   return (
     <span className="spark" style={{ left: spark.x, top: spark.y }} data-flip={spark.flip ? "" : undefined}>
       {/* U+FE0E keeps emoji-capable glyphs (✳) in text presentation so they take the accent color. */}
-      <span className="spark-glyph font-mono text-accent">{`${frames[pingPong(step, frames.length)]}\ufe0e`}</span>
+      <span className="spark-glyph font-mono text-accent">{`${glyph}\ufe0e`}</span>
       <span className="spark-label font-mono text-muted">{spark.label}</span>
     </span>
   );
@@ -64,8 +71,9 @@ function SparkMark({ spark, frames, onDone }: SparkMarkProps) {
 /**
  * Decorative feedback for completed primary clicks. Purely additive: it never prevents
  * default behavior or stops propagation, and the overlay ignores pointer events.
+ * Under reduced motion it shows one still glyph, and CSS swaps the pop-and-drift for a plain fade.
  */
-export function ClickSpark({ frames, labels, suffix }: ClickSparkProps) {
+export function ClickSpark({ frames, still, labels, suffix }: ClickSparkProps) {
   const [sparks, setSparks] = useState<readonly Spark[]>([]);
   const nextId = useRef(0);
 
@@ -97,7 +105,7 @@ export function ClickSpark({ frames, labels, suffix }: ClickSparkProps) {
       press = null;
 
       // detail === 0 means keyboard or synthetic activation, which has no meaningful position.
-      if (event.button !== 0 || event.detail === 0 || start === null || start.moved || motion.matches) return;
+      if (event.button !== 0 || event.detail === 0 || start === null || start.moved) return;
       if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > DRAG_TOLERANCE_PX) return;
       if (window.getSelection()?.toString()) return;
       if (event.target instanceof Element && event.target.closest(IGNORED_TARGETS)) return;
@@ -108,34 +116,29 @@ export function ClickSpark({ frames, labels, suffix }: ClickSparkProps) {
         y: event.clientY,
         label: `${labels[Math.floor(Math.random() * labels.length)]}${suffix}`,
         flip: event.clientX > window.innerWidth - LABEL_ROOM_PX,
+        still: motion.matches,
       };
       // Dropping the oldest unmounts it, which clears its timers.
       setSparks((current) => [...current, spark].slice(-MAX_SPARKS));
-    };
-
-    const onMotionChange = () => {
-      if (motion.matches) setSparks([]);
     };
 
     document.addEventListener("pointerdown", onPointerDown, { capture: true, passive: true });
     document.addEventListener("pointermove", onPointerMove, { capture: true, passive: true });
     document.addEventListener("pointercancel", onPointerCancel, { capture: true, passive: true });
     document.addEventListener("click", onClick, { capture: true });
-    motion.addEventListener("change", onMotionChange);
 
     return () => {
       document.removeEventListener("pointerdown", onPointerDown, { capture: true });
       document.removeEventListener("pointermove", onPointerMove, { capture: true });
       document.removeEventListener("pointercancel", onPointerCancel, { capture: true });
       document.removeEventListener("click", onClick, { capture: true });
-      motion.removeEventListener("change", onMotionChange);
     };
   }, [labels, suffix]);
 
   return (
-    <div aria-hidden="true" className="spark-layer pointer-events-none fixed inset-0 z-50 overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
       {sparks.map((spark) => (
-        <SparkMark key={spark.id} spark={spark} frames={frames} onDone={remove} />
+        <SparkMark key={spark.id} spark={spark} frames={frames} still={still} onDone={remove} />
       ))}
     </div>
   );

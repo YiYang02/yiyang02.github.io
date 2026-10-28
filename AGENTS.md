@@ -18,22 +18,24 @@ ten seconds. Every change must keep the rules below; `npm run check` must stay a
 - All copy, links, and labels live in `src/content/site.ts` as typed data. Components render only from it and never
   hardcode visible text. Change copy there, verbatim, and only with the owner's approval.
 - Layout and section order (single page): header → hero → About → Experience → Selected work → Skills → Education →
-  Contact/footer. Nav: About · Experience · Work · Skills · Résumé ↗. The hero has no paragraph; About is the bio.
+  Contact/footer. Nav: About · Experience · Work · Skills · Résumé ↗, followed by the theme toggle. The hero has no
+  paragraph; About is the bio.
 
 ### Design tokens
 
-Defined in `@theme` in `src/app/globals.css`. Tailwind's default palette is cleared, so these are the only colors:
+Defined in `@theme` in `src/app/globals.css`; the dark values override the same variables under
+`:root[data-theme="dark"]`. Tailwind's default palette is cleared, so these are the only colors:
 
-| Token                 | Value     | Use                                         |
-| --------------------- | --------- | ------------------------------------------- |
-| `--color-bg`          | `#FFFFFF` | page background (light only)                |
-| `--color-ink`         | `#0D0D0F` | headings, titles, bullets, links            |
-| `--color-ink-2`       | `#4A4F57` | lede, context sentences, prose              |
-| `--color-muted`       | `#5E636B` | labels, dates, meta, team names             |
-| `--color-rule`        | `#E7E8EA` | 1px rules, badge and headshot borders       |
-| `--color-accent`      | `#2347E6` | the one accent: kicker, tags, focus, caret  |
-| `--color-accent-wash` | `#E3E8FD` | text selection, status-dot ring             |
-| `--color-underline`   | `#C9CCD2` | link underlines (ink on hover)              |
+| Token                 | Light     | Dark      | Use                                         |
+| --------------------- | --------- | --------- | ------------------------------------------- |
+| `--color-bg`          | `#FFFFFF` | `#0E0F11` | page background                             |
+| `--color-ink`         | `#0D0D0F` | `#ECECEE` | headings, titles, bullets, links            |
+| `--color-ink-2`       | `#4A4F57` | `#B4B9C1` | lede, context sentences, prose              |
+| `--color-muted`       | `#5E636B` | `#8B9199` | labels, dates, meta, team names             |
+| `--color-rule`        | `#E7E8EA` | `#2A2D32` | 1px rules, badge and headshot borders       |
+| `--color-accent`      | `#2347E6` | `#8DA2FF` | the one accent: kicker, tags, focus, caret  |
+| `--color-accent-wash` | `#E3E8FD` | `#1D2650` | text selection, status-dot ring             |
+| `--color-underline`   | `#C9CCD2` | `#4D525A` | link underlines (ink on hover)              |
 
 - Fonts: Geist 400/500/600 and Geist Mono 400/500 via `next/font/google`, mapped to `--font-sans` / `--font-mono`.
 - Type: H1 `clamp(2.5rem, 5.2vw, 3.75rem)` / 1.04 / -0.035em / 600, max 15ch · lede 1.1875rem / 1.6 / ink-2,
@@ -43,24 +45,38 @@ Defined in `@theme` in `src/app/globals.css`. Tailwind's default palette is clea
   rule and 56px / 40px vertical padding. Date and label columns inside sections are 132px.
 - Radius 4px (headshot) and full pills (badges) only. Header has a bottom rule and is not sticky.
 
+### Theme
+
+- Light and dark themes share one token set. A blocking inline script in `<head>` (`src/lib/theme.ts`) sets
+  `<html data-theme>` before first paint: the visitor's saved choice (`localStorage` key `theme`), else the OS
+  `prefers-color-scheme`. Until the visitor picks a theme, the page follows live OS changes; a click counts as a
+  choice for that page view even when storage is blocked.
+- The header toggle (`src/components/theme-toggle.tsx`) is a native `<button>` named "Switch to Dark mode" or
+  "Switch to Light mode"; CSS picks the label from `data-theme`, so server and client markup match. It is hidden
+  when JavaScript does not run (no `data-theme`), re-applies `data-theme` after React Strict Mode's dev remount
+  clears it, and switching themes adds no animation beyond the existing ≤150 ms color transitions.
+- The dark tokens apply on screen only: printing always uses the light palette.
+
 ### Banned
 
 Gradients, glass/blur, glow or drop shadows (the status dot's flat 4px ring is the only box-shadow), grain, boxed
 card grids, scroll-reveal, smooth-scroll libraries, preloaders, custom cursors, icon libraries (use the ↗ and →
-glyphs), emoji (the spinner glyphs `· ✢ ✳ ✶ ✻ ✽` are the only exception), dark mode, and any new color outside the
-token table.
+glyphs), emoji (the spinner glyphs `· ✢ ✳ ✶ ✻ ✽` and the theme glyph `◐` are the only exceptions), and any new
+color outside the token table.
 
 ### Motion
 
 - Only three motions exist: link/hover color transitions (≤150 ms), the hero caret, and the click spark.
+  Experience disclosures open and close instantly.
 - Caret: `aria-hidden`, blinks three times (~3.3 s) and then stays solid. No animation under reduced motion.
 - Click spark (`src/components/click-spark.tsx`): fires only on a completed primary `click` from a real pointer.
   It skips drags (>6px from the pointerdown), active text selections, form fields, `[contenteditable]`, and
   anything inside `[data-no-spark]`. It never calls `preventDefault` or `stopPropagation`, renders into a fixed
   `pointer-events: none`, `aria-hidden` overlay, lives 900 ms, keeps at most five sparks, and cleans up all
   listeners and timers on unmount.
-- `prefers-reduced-motion: reduce` disables the spark (live: turning it on clears active sparks), hides the
-  "click anywhere" hint, and stops the caret.
+- `prefers-reduced-motion: reduce` stops the caret and shows the spark as a single still `✻` with its label, fading
+  in place (no pop, drift, or glyph cycling). The spark and its "click anywhere" hint stay visible: Windows reports
+  reduced motion whenever "Animation effects" is off, which includes many remote-desktop sessions.
 
 ### Accessibility
 
@@ -70,7 +86,11 @@ token table.
   accent outline with a 3px offset; never remove it.
 - External links (including the résumé PDF) use `target="_blank" rel="noopener noreferrer"`, a decorative ↗ in an
   `aria-hidden` span, and a visually hidden " (opens in a new tab)". Use `ExternalLink` for every one.
-- Decorative glyphs (↗, →, list dashes, status dot, caret, spark) are `aria-hidden`. The headshot alt is "Yi Yang".
+- Decorative glyphs (↗, →, list dashes, status dot, caret, spark, theme `◐`, disclosure `+`/`−`) are `aria-hidden`.
+  The headshot alt is "Yi Yang".
+- Experience bullets sit in a native `<details>` disclosure (closed by default on screen; printed pages show every
+  role's details and hide the summaries and the theme toggle). The `<summary>` reads "Show details" or "Hide
+  details" plus a visually hidden "for {role}, {org}, {team}", so each one is distinguishable out of context.
 - Targets are at least 24×24px (nav links have `min-h-6`). No horizontal scrolling at 320px wide or at 400% zoom;
   long tokens wrap (`overflow-wrap: anywhere` on tags). Experience dates stack above entries below 640px.
 - Text contrast stays at WCAG AA or better; muted text is the lightest text color allowed.
@@ -81,6 +101,7 @@ token table.
 - Never name clients, products, communities, third-party businesses, or the startup's business domain — not in
   copy, code, comments, docs, metadata, alt text, or commit messages. Startup work is described only by its
   engineering (architecture, reliability, testing, tooling), never by what the business does or how it gets data.
+  The owner's personal interests in About are the one exception (for example, Citi Bike).
 - "Built" means Yi built it alone; "Co-built" means it was built with others. Never upgrade Co-built to Built.
 - The Microsoft entry's bullets come from the owner's verified work record (PRs, work items, and release data).
   Change or add claims and numbers only with the owner's approval. Do not add placeholders.

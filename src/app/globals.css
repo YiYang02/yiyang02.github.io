@@ -46,9 +46,31 @@
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* The head script always sets <html data-theme> when JavaScript runs; `themed:` styles depend on it. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant themed (&:where([data-theme], [data-theme] *));
+
 @layer base {
   :root {
     color-scheme: light;
+  }
+
+  /*
+   * Dark theme: the same token roles, re-valued. Every text pair stays at WCAG AA or better.
+   * Screen only, so printing always uses the light palette (browsers drop backgrounds on paper).
+   */
+  @media screen {
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --color-bg: #0e0f11;
+      --color-ink: #ececee;
+      --color-ink-2: #b4b9c1;
+      --color-muted: #8b9199;
+      --color-rule: #2a2d32;
+      --color-accent: #8da2ff;
+      --color-accent-wash: #1d2650;
+      --color-underline: #4d525a;
+    }
   }
 
   html {
@@ -143,7 +165,7 @@
     font-size: 12px;
     line-height: 1;
     white-space: nowrap;
-    /* White halo keeps the label legible when it lands on top of dark text. */
+    /* A halo in the page color keeps the label legible when it lands on top of text. */
     text-shadow:
       0 0 2px var(--color-bg),
       0 0 4px var(--color-bg),
@@ -183,13 +205,41 @@
   }
 }
 
+/* Reduced-motion spark: the same timing as spark-life, opacity only. */
+@keyframes spark-fade {
+  0% {
+    opacity: 0;
+  }
+  13.333% {
+    opacity: 1;
+  }
+  72.222% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .caret {
     animation: none;
   }
 
-  .spark-layer,
-  .spark-hint {
+  /* The spark stays (it is click feedback) but loses its pop and drift; the component also stops glyph cycling. */
+  .spark {
+    animation-name: spark-fade;
+  }
+}
+
+/* Print every role's details, and drop the controls that only make sense on screen. */
+@media print {
+  details::details-content {
+    content-visibility: visible;
+  }
+
+  details > summary,
+  [data-theme-toggle] {
     display: none;
   }
 }

@@ -22,9 +22,7 @@ export function SiteFooter() {
           {contact.smallPrint}
           <ExternalLink href={contact.source.href}>{contact.source.label}</ExternalLink>
         </p>
-        <p aria-hidden="true" className="spark-hint">
-          {contact.hint}
-        </p>
+        <p aria-hidden="true">{contact.hint}</p>
       </div>
     </Section>
   );

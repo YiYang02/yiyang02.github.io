@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { ClickSpark } from "@/components/click-spark";
 import { siteMeta, spark, ui } from "@/content/site";
+import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,19 +41,23 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: "light",
+  colorScheme: "light dark",
 };
 
 // Props are typed explicitly (not LayoutProps) so `tsc --noEmit` passes before `next build` generates route types.
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    // suppressHydrationWarning: the head script sets data-theme before React hydrates.
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="bg-bg font-sans text-ink">
         <a href="#main" className="skip-link font-mono text-meta">
           {ui.skipLink}
         </a>
         <div className="mx-auto max-w-page px-5 md:px-10">{children}</div>
-        <ClickSpark frames={spark.frames} labels={spark.labels} suffix={spark.suffix} />
+        <ClickSpark frames={spark.frames} still={spark.still} labels={spark.labels} suffix={spark.suffix} />
       </body>
     </html>
   );
